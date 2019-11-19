@@ -75,3 +75,14 @@ span {
 .alert-radio-label.sc-ion-alert-ios {
   white-space: normal;
 }
+
+.alert-sub-title.sc-ion-alert-md, 
+.alert-title.sc-ion-alert-md,
+.alert-sub-title.sc-ion-alert-ios, 
+.alert-title.sc-ion-alert-ios{
+  color: red;
+}
+
+.alert-css-class {
+  --max-width: 400px;
+}

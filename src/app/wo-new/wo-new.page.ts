@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiService } from "../services/api.service";
 import { FormGroup, FormControl, Validators } from '@angular/forms';
-import { LoadingController } from "@ionic/angular";
+import { LoadingController, AlertController } from "@ionic/angular";
 
 @Component({
 	selector: 'app-wo-new',
@@ -16,7 +16,8 @@ export class WONEWPage implements OnInit {
 
 	constructor(
 		private api: ApiService,
-		public loadingController: LoadingController
+		public loadingController: LoadingController,
+		public alertController: AlertController
 	) { }
 
 	async loadingWithOptions() {
@@ -27,6 +28,18 @@ export class WONEWPage implements OnInit {
 			translucent: true
 		});
 		return await loading;
+	}
+
+	async presentAlert(header:string, subHeader:string, msg:string ) {
+		const alert = await this.alertController.create({
+			header: header,
+			subHeader: subHeader,
+			message: msg,
+			animated: true,
+			cssClass: 'alert-css-class',
+			buttons: ['OK']
+		});
+		return await alert;
 	}
 
 	ngOnInit() {
@@ -73,13 +86,29 @@ export class WONEWPage implements OnInit {
 	onSubmit() {
 		let results = this.myFormGroup.getRawValue();
 		var skipped = [];
+		// Check Required Fields
 		if (this.req_array.length) {
 			for (let i = 0; i < this.req_array.length; i++) {
 				if (results[this.req_array[i]] == '') skipped.push(this.req_array[i]);
 			}
+			// if either BUILDING_ID or EQP_NO filled 
+			if (results.EQP_NO.length || results.BUILDING_ID.length) {
+				var x = skipped.indexOf('EQP_NO');
+				if (x > -1) skipped.splice(x,1);
+				x = skipped.indexOf('BUILDING_ID');
+				if (x > -1) skipped.splice(x,1);
+			}
 		}
 		if (skipped.length) {
-			alert("Please fill the following fields: \n\t" + skipped.join("\n\t"));
+			let header = "Required Fields";
+			let subHeader = '';
+			var message = "<p>Please fill the following fields: </p><ul>";
+			skipped.forEach(element => {
+				message += "<li>"+element+"</li>";
+			})
+			message += '</ul>'
+			let popup = this.presentAlert(header, subHeader, message);
+			popup.then(alert => alert.present());
 			return;
 		}
 	}
