@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiService } from "../services/api.service";
 import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { LoadingController } from "@ionic/angular";
 
 @Component({
 	selector: 'app-wo-new',
@@ -13,10 +14,25 @@ export class WONEWPage implements OnInit {
 	form_template: any[];
 	req_array: any[] = [];
 
-	constructor(private api: ApiService) { }
+	constructor(
+		private api: ApiService,
+		public loadingController: LoadingController
+	) { }
+
+	async loadingWithOptions() {
+		const loading = await this.loadingController.create({
+			spinner: 'bubbles',
+			duration: 50000,
+			message: 'Please wait...',
+			translucent: true
+		});
+		return await loading;
+	}
 
 	ngOnInit() {
 		let form = {};
+		let load = this.loadingWithOptions();
+		load.then(spinner => spinner.present());
 		this.api.getElement('init').subscribe(results => {
 			for (let i = 0; i < results.length; i++) {
 				const element = results[i];
@@ -50,6 +66,7 @@ export class WONEWPage implements OnInit {
 			this.myFormGroup = new FormGroup(form);
 			this.form_template = results;
 			this.myFormGroup.updateValueAndValidity();
+			load.then(spinner => spinner.dismiss());
 		})
 	}
 
@@ -61,7 +78,7 @@ export class WONEWPage implements OnInit {
 				if (results[this.req_array[i]] == '') skipped.push(this.req_array[i]);
 			}
 		}
-		if (skipped.length){
+		if (skipped.length) {
 			alert("Please fill the following fields: \n\t" + skipped.join("\n\t"));
 			return;
 		}

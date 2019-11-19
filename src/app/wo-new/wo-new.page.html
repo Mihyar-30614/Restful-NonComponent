@@ -6,8 +6,8 @@
 
 <ion-content fullscreen color="light" class="form-content">
 	<ion-grid class="ion-no-padding">
-		<form *ngIf="form_template; else loading" [formGroup]="myFormGroup" (ngSubmit)="onSubmit()">
-
+		<!-- <form *ngIf="form_template; else loading" [formGroup]="myFormGroup" (ngSubmit)="onSubmit()"> -->
+		<form *ngIf="form_template" [formGroup]="myFormGroup" (ngSubmit)="onSubmit()">
 			<ng-container *ngFor="let form_elem of form_template">
 				<ng-container [ngSwitch]="form_elem.POS_CONTROL_TYPE">
 					<!-- TEXTBOX -->
@@ -87,10 +87,9 @@
 				<ion-col size="2"></ion-col>
 			</ion-row>
 		</form>
-		<ng-template #loading>
-			Loading ...
-
-		</ng-template>
+		<!-- <ng-template #loading>
+			<ion-spinner name="bubbles" color="tertiary"></ion-spinner>
+		</ng-template> -->
 	</ion-grid>
 
 </ion-content>
