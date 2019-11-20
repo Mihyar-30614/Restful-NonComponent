@@ -30,7 +30,7 @@ export class WONEWPage implements OnInit {
 		return await loading;
 	}
 
-	async presentAlert(header:string, subHeader:string, msg:string ) {
+	async presentAlert(header: string, subHeader: string, msg: string) {
 		const alert = await this.alertController.create({
 			header: header,
 			subHeader: subHeader,
@@ -46,7 +46,7 @@ export class WONEWPage implements OnInit {
 		let form = {};
 		let load = this.loadingWithOptions();
 		load.then(spinner => spinner.present());
-		this.api.getElement('init').subscribe(results => {
+		this.api.get('init').subscribe(results => {
 			for (let i = 0; i < results.length; i++) {
 				const element = results[i];
 				var temp = element.POS_DICT_NAME;
@@ -94,9 +94,9 @@ export class WONEWPage implements OnInit {
 			// if either BUILDING_ID or EQP_NO filled 
 			if (results.EQP_NO.length || results.BUILDING_ID.length) {
 				var x = skipped.indexOf('EQP_NO');
-				if (x > -1) skipped.splice(x,1);
+				if (x > -1) skipped.splice(x, 1);
 				x = skipped.indexOf('BUILDING_ID');
-				if (x > -1) skipped.splice(x,1);
+				if (x > -1) skipped.splice(x, 1);
 			}
 		}
 		if (skipped.length) {
@@ -104,13 +104,30 @@ export class WONEWPage implements OnInit {
 			let subHeader = '';
 			var message = "<p>Please fill the following fields: </p><ul>";
 			skipped.forEach(element => {
-				message += "<li>"+element+"</li>";
+				message += "<li>" + element + "</li>";
 			})
 			message += '</ul>'
 			let popup = this.presentAlert(header, subHeader, message);
 			popup.then(alert => alert.present());
 			return;
 		}
+
+		// Data Clean Up
+		for (const key in results) {
+			if (!results[key].length) delete results[key];
+			if (key == "DATE") {
+				let Res = results[key];
+				Res = Res.toUpperCase().replace(', ', ',');
+				if (Res.length) Res = "" + Date.parse(Res);
+				results[key] = Res;
+			}
+		}
+		
+		this.api.post('WRITE_WO', results).subscribe(resp => {
+			let popup = this.presentAlert('', '', resp.msg);
+			popup.then(alert => alert.present());
+			this.myFormGroup.reset();
+		})
 	}
 
 }
