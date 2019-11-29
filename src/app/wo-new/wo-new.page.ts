@@ -129,5 +129,5 @@ export class WONEWPage implements OnInit {
 			this.myFormGroup.reset();
 		})
 	}
-
+	
 }
